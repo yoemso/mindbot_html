@@ -1,0 +1,2540 @@
+<!DOCTYPE html>
+<html lang="ko" class="w-full max-w-full overflow-x-hidden">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no viewport-fit=cover interactive-widget=resizes-content"
+        />
+        <title>마인드봇 프로젝트 x 나의 결 (Texture of Me)</title>
+
+        <!-- Tailwind CSS CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+
+        <!-- Pretendard Variable Web Font CDN -->
+        <link
+            rel="stylesheet"
+            as="style"
+            crossorigin
+            href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+        />
+
+        <!-- FontAwesome 6 Icons CDN -->
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+
+        <!-- SheetJS CDN for Formatted Excel Export -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+        <style>
+            *,
+            ::before,
+            ::after {
+                box-sizing: border-box;
+            }
+
+            :root {
+                --bg-dark: #0b0f19;
+                --card-glass: rgba(17, 24, 39, 0.75);
+                --border-glass: rgba(255, 255, 255, 0.1);
+                --neon-cyan: #00f2fe;
+                --neon-blue: #4facfe;
+                --neon-emerald: #10b981;
+                --neon-purple: #8b5cf6;
+                --neon-amber: #f59e0b;
+            }
+
+            html,
+            body {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden !important;
+                margin: 0;
+                padding: 0;
+                background-color: var(--bg-dark);
+                color: #f3f4f6;
+                font-family: "Pretendard Variable", Pretendard, -apple-system,
+                    BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+                -webkit-font-smoothing: antialiased;
+                word-break: keep-all;
+            }
+
+            /* Tech Mesh Pattern Background */
+            .bg-mesh-pattern {
+                position: relative;
+                overflow: hidden;
+                background-image: radial-gradient(
+                        rgba(0, 242, 254, 0.08) 1px,
+                        transparent 1px
+                    ),
+                    radial-gradient(
+                        rgba(139, 92, 246, 0.08) 1px,
+                        transparent 1px
+                    );
+                background-size: 36px 36px;
+                background-position: 0 0, 18px 18px;
+            }
+
+            /* Ambient Glow Blobs */
+            .glow-top-left {
+                position: absolute;
+                width: 500px;
+                height: 500px;
+                background: radial-gradient(
+                    circle,
+                    rgba(0, 242, 254, 0.18) 0%,
+                    rgba(0, 0, 0, 0) 70%
+                );
+                top: -150px;
+                left: -100px;
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            .glow-bottom-right {
+                position: absolute;
+                width: 550px;
+                height: 550px;
+                background: radial-gradient(
+                    circle,
+                    rgba(139, 92, 246, 0.18) 0%,
+                    rgba(0, 0, 0, 0) 70%
+                );
+                bottom: -150px;
+                right: -100px;
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            .glass-card {
+                background: var(--card-glass);
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                border: 1px solid var(--border-glass);
+                box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+            }
+
+            .glass-card-hover {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .glass-card-hover:hover {
+                border-color: rgba(0, 242, 254, 0.4);
+                transform: translateY(-3px);
+                box-shadow: 0 25px 50px -12px rgba(0, 242, 254, 0.25);
+            }
+
+            /* Neon Text Gradients */
+            .gradient-text-cyan {
+                background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            .gradient-text-purple {
+                background: linear-gradient(
+                    135deg,
+                    #a78bfa 0%,
+                    #8b5cf6 50%,
+                    #ec4899 100%
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            .gradient-text-amber {
+                background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            /* Neon Glow Result Headers */
+            .neon-result-cyan {
+                background: linear-gradient(
+                    135deg,
+                    #00f2fe 0%,
+                    #38bdf8 50%,
+                    #818cf8 100%
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                filter: drop-shadow(0 0 20px rgba(0, 242, 254, 0.6));
+            }
+
+            .neon-result-amber {
+                background: linear-gradient(
+                    135deg,
+                    #fbbf24 0%,
+                    #f59e0b 50%,
+                    #f97316 100%
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.6));
+            }
+
+            .neon-result-purple {
+                background: linear-gradient(
+                    135deg,
+                    #c084fc 0%,
+                    #8b5cf6 50%,
+                    #ec4899 100%
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.6));
+            }
+
+            .neon-result-emerald {
+                background: linear-gradient(
+                    135deg,
+                    #34d399 0%,
+                    #10b981 50%,
+                    #059669 100%
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.6));
+            }
+
+            /* Form Inputs & Buttons */
+            .input-tech {
+                background-color: rgba(15, 23, 42, 0.85);
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                color: #f3f4f6;
+                border-radius: 0.85rem;
+                padding: 0.875rem 1.125rem;
+                transition: all 0.25s ease;
+                box-sizing: border-box;
+                width: 100%;
+            }
+            .input-tech::placeholder {
+                color: #6b7280;
+            }
+            .input-tech:focus {
+                outline: none;
+                border-color: #00f2fe;
+                background-color: rgba(15, 23, 42, 0.95);
+                box-shadow: 0 0 20px rgba(0, 242, 254, 0.25);
+            }
+
+            .btn-neon-primary {
+                background: linear-gradient(
+                    135deg,
+                    #00f2fe 0%,
+                    #4facfe 50%,
+                    #8b5cf6 100%
+                );
+                color: #080c14;
+                font-weight: 800;
+                box-shadow: 0 0 25px rgba(0, 242, 254, 0.35);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .btn-neon-primary:hover {
+                box-shadow: 0 0 35px rgba(0, 242, 254, 0.6);
+                transform: translateY(-2px);
+                filter: brightness(1.1);
+            }
+
+            .btn-tech-secondary {
+                background: rgba(255, 255, 255, 0.06);
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                color: #e5e7eb;
+                transition: all 0.2s ease;
+            }
+            .btn-tech-secondary:hover {
+                background: rgba(255, 255, 255, 0.12);
+                border-color: rgba(0, 242, 254, 0.4);
+                color: #ffffff;
+            }
+
+            /* Modal Overlays */
+            .modal-overlay {
+                background: rgba(3, 7, 18, 0.85);
+                backdrop-filter: blur(14px);
+                -webkit-backdrop-filter: blur(14px);
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.25s ease;
+            }
+
+            .modal-overlay.active {
+                pointer-events: auto;
+                opacity: 1;
+            }
+
+            /* Toast Notifications */
+            #toast-notification {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transform: translateY(100px);
+                opacity: 0;
+                pointer-events: none;
+            }
+            #toast-notification.show {
+                transform: translateY(0);
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            /* Custom Scrollbar */
+            ::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+            ::-webkit-scrollbar-track {
+                background: #0b0f19;
+            }
+            ::-webkit-scrollbar-thumb {
+                background: #1f2937;
+                border-radius: 3px;
+            }
+            ::-webkit-scrollbar-thumb:hover {
+                background: #374151;
+            }
+        </style>
+    </head>
+    <body
+        class="min-h-screen flex flex-col bg-mesh-pattern w-full max-w-full overflow-x-hidden"
+    >
+        <div class="glow-top-left"></div>
+        <div class="glow-bottom-right"></div>
+
+        <!-- NAVIGATION HEADER -->
+        <header
+            class="sticky top-0 z-40 bg-[#0B0F19]/90 backdrop-blur-xl border-b border-white/10 px-3 sm:px-8 pt-[calc(0.875rem+env(safe-area-inset-top))] pb-3.5 w-full"
+        >
+            <div
+                class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left"
+            >
+                <!-- Brand Logo -->
+                <div
+                    class="flex items-center gap-3 cursor-pointer group justify-center sm:justify-start"
+                    onclick="switchView('client')"
+                >
+                    <div
+                        class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-400 via-blue-500 to-purple-600 p-[1px] shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-500/40 transition-all"
+                    >
+                        <div
+                            class="w-full h-full bg-[#0B0F19] rounded-[15px] flex items-center justify-center text-cyan-400"
+                        >
+                            <i class="fa-solid fa-fingerprint text-lg"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div
+                            class="flex items-center gap-2 justify-center sm:justify-start"
+                        >
+                            <span
+                                class="font-black text-base sm:text-lg tracking-tight text-white"
+                                >마인드봇 x
+                                <span class="gradient-text-cyan"
+                                    >ZIPER</span
+                                ></span
+                            >
+                            <span
+                                class="px-2 py-0.5 text-[9px] uppercase tracking-widest font-extrabold rounded-full bg-cyan-950/90 text-cyan-400 border border-cyan-500/30"
+                                >TEXTURE OF ME</span
+                            >
+                        </div>
+                        <p
+                            class="text-[10px] sm:text-[11px] text-gray-400 font-light hidden sm:block"
+                        >
+                            AI Personal Branding & Self-Diagnosis Platform
+                        </p>
+                    </div>
+                </div>
+                <button
+                    id="fullscreen-btn"
+                    onclick="switchFullscreen()"
+                    class="flex-1 sm:flex-none px-4 py-2 rounded-xl transition-all duration-200 btn-neon-primary flex items-center justify-center gap-1.5 text-xs"
+                >
+                    <i class="fa-solid fa-sparkles text-[11px]"></i>
+                    <span> 전체화면으로 전환하기 </span>
+                </button>
+                <!-- Navigation View Switcher Tabs -->
+                <nav
+                    class="flex items-center justify-center bg-gray-900/90 p-1.5 rounded-2xl border border-white/10 text-xs font-semibold w-full sm:w-auto max-w-sm sm:max-w-none"
+                >
+                    <button
+                        id="nav-client-btn"
+                        onclick="switchView('client')"
+                        class="flex-1 sm:flex-none px-4 py-2 rounded-xl transition-all duration-200 btn-neon-primary flex items-center justify-center gap-1.5 text-xs"
+                    >
+                        <i class="fa-solid fa-sparkles text-[11px]"></i>
+                        <span>✨ 고객 화면</span>
+                    </button>
+                    <button
+                        id="nav-admin-btn"
+                        onclick="switchView('admin')"
+                        class="flex-1 sm:flex-none px-4 py-2 rounded-xl transition-all duration-200 text-gray-400 hover:text-white flex items-center justify-center gap-1.5 relative text-xs"
+                    >
+                        <i class="fa-solid fa-chart-tree-map text-[11px]"></i>
+                        <span>💼 관리자 대시보드</span>
+                    </button>
+                </nav>
+            </div>
+        </header>
+
+        <main
+            class="flex-grow z-10 relative w-full max-w-full overflow-x-hidden flex-1"
+        >
+            <!-- CLIENT VIEW SECTION -->
+            <div
+                id="client-view"
+                class="view-section flex flex-col w-full max-w-3xl mx-auto px-4 py-8 sm:py-12 gap-10 sm:gap-14 items-center box-border"
+            >
+                <!-- Hero Header -->
+                <section
+                    class="text-center w-full max-w-2xl mx-auto relative flex flex-col items-center"
+                >
+                    <div
+                        class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-950/80 border border-cyan-500/30 text-cyan-400 text-xs font-bold tracking-wide mb-5"
+                    >
+                        <span
+                            class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"
+                        ></span>
+                        <span>2026 MIND-BOT PROJECT x ZIPER</span>
+                    </div>
+
+                    <h1
+                        class="text-3xl sm:text-5xl font-black mb-5 leading-tight tracking-tight text-white text-center"
+                    >
+                        ZIPER를 통한<br />
+                        <span class="gradient-text-cyan">마인드봇 PROJECT</span>
+                    </h1>
+
+                    <p
+                        class="text-gray-300 leading-relaxed font-normal text-xs sm:text-base w-full bg-gray-900/50 p-5 rounded-2xl border border-white/10 shadow-2xl text-center"
+                    >
+                        상담봇을 통해 일상 속 고민을 털어놓고 내면의 결을
+                        발견하세요.<br class="hidden sm:inline" />
+                        독창적인 개인 브랜드 슬로건과 3단계 질문 진단으로
+                        당신에게 꼭 맞는
+                        <strong class="text-cyan-400 font-semibold"
+                            >3단계 맞춤형 로드맵</strong
+                        >을 제안합니다.
+                    </p>
+                </section>
+
+                <!-- BRAND STORY POINTS SECTION -->
+                <section class="w-full space-y-6 sm:space-y-8 relative">
+                    <!-- SECTION TITLE: Brand Story Points -->
+                    <div class="flex justify-center w-full mb-6">
+                        <div
+                            class="inline-flex items-center justify-center gap-3 px-8 py-3.5 sm:px-10 sm:py-4 rounded-full bg-gradient-to-r from-cyan-950/90 via-blue-950/90 to-purple-950/90 border border-cyan-400/50 text-cyan-300 shadow-2xl shadow-cyan-500/30 text-center mx-auto transform hover:scale-105 transition-all"
+                        >
+                            <span
+                                class="w-3.5 h-3.5 rounded-full bg-cyan-400 animate-pulse shadow-lg shadow-cyan-400"
+                            ></span>
+                            <h2
+                                class="text-xl sm:text-3xl font-black text-white tracking-widest uppercase font-mono"
+                            >
+                                ✨ Brand Story Points
+                            </h2>
+                        </div>
+                    </div>
+
+                    <!-- POINT 01 -->
+                    <div
+                        class="glass-card glass-card-hover rounded-3xl p-6 sm:p-8 border border-cyan-500/30 relative overflow-hidden shadow-2xl w-full box-border"
+                    >
+                        <div
+                            class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5 relative z-10"
+                        >
+                            <span
+                                class="px-3.5 py-1 bg-cyan-950/90 text-cyan-400 border border-cyan-500/40 text-xs font-mono font-black rounded-xl shadow-lg flex items-center gap-2"
+                            >
+                                <i class="fa-solid fa-lightbulb"></i> POINT 01 /
+                                기획의도
+                            </span>
+                            <span
+                                class="text-xs text-cyan-300/80 font-mono tracking-widest uppercase"
+                                >Dialogue with AI Chatbot</span
+                            >
+                        </div>
+
+                        <h3
+                            class="text-xl sm:text-2xl font-black text-white mb-4 relative z-10 flex items-center gap-2"
+                        >
+                            챗봇과의 대화?
+                        </h3>
+
+                        <!-- Speech Bubble Quote Box -->
+                        <div
+                            class="relative bg-gradient-to-r from-cyan-950/80 to-indigo-950/80 p-4 sm:p-5 rounded-2xl border border-cyan-500/30 mb-4 shadow-inner z-10 w-full box-border"
+                        >
+                            <div class="text-cyan-400 text-lg mb-1">
+                                <i class="fa-solid fa-quote-left"></i>
+                            </div>
+                            <p
+                                class="text-xs sm:text-base font-bold text-cyan-200 italic pl-2 leading-relaxed"
+                            >
+                                "저는 챗봇이랑 이야기를 해요. 그러면 그나마 좀
+                                속이 트이는 것 같더라고요."
+                            </p>
+                        </div>
+
+                        <p
+                            class="text-xs sm:text-sm text-gray-300 leading-relaxed relative z-10 font-light"
+                        >
+                            기획회의 중 한 참여자의 진솔한 경험에서
+                            시작되었습니다. 마인드봇은 익명성을 보장하며, 누구나
+                            마음의 짐을 털어놓고 내면의 결을 가다듬을 수 있도록
+                            돕습니다.
+                        </p>
+                    </div>
+
+                    <!-- POINT 02 -->
+                    <div
+                        class="glass-card glass-card-hover rounded-3xl p-6 sm:p-8 border border-amber-500/30 relative overflow-hidden shadow-2xl w-full box-border"
+                    >
+                        <div
+                            class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5 relative z-10"
+                        >
+                            <span
+                                class="px-3.5 py-1 bg-amber-950/90 text-amber-400 border border-amber-500/40 text-xs font-mono font-black rounded-xl shadow-lg flex items-center gap-2"
+                            >
+                                <i class="fa-solid fa-shield-halved"></i> POINT
+                                02 / 문제점 분석
+                            </span>
+                            <span
+                                class="text-xs text-amber-300/80 font-mono tracking-widest uppercase"
+                                >Ethical AI Guidance</span
+                            >
+                        </div>
+
+                        <h3
+                            class="text-xl sm:text-2xl font-black text-white mb-3 relative z-10 gradient-text-amber"
+                        >
+                            우리가 더 신중한 이유 (윤리적 AI)
+                        </h3>
+
+                        <div
+                            class="p-4 bg-amber-950/30 border-l-4 border-amber-500 rounded-r-2xl relative z-10 w-full box-border"
+                        >
+                            <p
+                                class="text-xs sm:text-sm text-gray-200 leading-relaxed font-normal"
+                            >
+                                상담 AI가 자칫 무분별한 답변으로 사용자에게
+                                오해를 주지 않도록, 전문 상담진과의 디렉팅을
+                                거쳐
+                                <span
+                                    class="text-amber-300 font-bold underline underline-offset-4"
+                                    >안전하고 정교한 가이드라인</span
+                                >을 구축하였습니다.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- POINT 03 -->
+                    <div
+                        class="glass-card glass-card-hover rounded-3xl p-6 sm:p-8 border border-purple-500/30 relative overflow-hidden shadow-2xl w-full box-border"
+                    >
+                        <div
+                            class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5 relative z-10"
+                        >
+                            <span
+                                class="px-3.5 py-1 bg-purple-950/90 text-purple-300 border border-purple-500/40 text-xs font-mono font-black rounded-xl shadow-lg flex items-center gap-2"
+                            >
+                                <i class="fa-solid fa-rocket"></i> POINT 03 /
+                                프로모션 혜택
+                            </span>
+                            <span
+                                class="text-xs text-purple-300/80 font-mono tracking-widest uppercase"
+                                >Beta Tester Recruitment</span
+                            >
+                        </div>
+
+                        <h3
+                            class="text-xl sm:text-2xl font-black text-white mb-3 relative z-10"
+                        >
+                            마인드봇 X ZIPER 베타테스터 모집
+                        </h3>
+
+                        <div
+                            class="bg-gradient-to-br from-purple-950/60 to-gray-900/90 p-5 rounded-2xl border border-purple-500/30 relative z-10 w-full box-border"
+                        >
+                            <p
+                                class="text-xs sm:text-sm text-gray-200 leading-relaxed font-light"
+                            >
+                                이번 달 프로모션 기간 동안
+                                <strong
+                                    class="text-cyan-400 font-bold underline decoration-cyan-400"
+                                    >1:1 AI 퍼스널 진단 및 상담을 이번 달
+                                    프로모션 기간 동안 제공</strong
+                                >합니다. 진단 데이터를 기반으로 전담 코치가 직접
+                                연결되어 맞춤형 로드맵을 제공합니다.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- DIAGNOSTIC TEST SECTION -->
+                <section
+                    class="w-full glass-card rounded-3xl p-6 sm:p-10 relative border border-cyan-500/40 shadow-2xl overflow-hidden box-border"
+                >
+                    <!-- SECTION TITLE: AI 마인드봇 테스트 -->
+                    <div
+                        class="text-center mb-8 w-full mx-auto flex flex-col items-center"
+                    >
+                        <div
+                            class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-xs font-mono font-bold mb-3 shadow-lg shadow-cyan-500/20"
+                        >
+                            <i class="fa-solid fa-compass text-cyan-400"></i>
+                            <span>TEXTURE OF ME DIAGNOSIS</span>
+                        </div>
+                        <h2
+                            class="text-3xl sm:text-6xl font-black mb-3 tracking-tight leading-tight gradient-text-cyan text-center filter drop-shadow-[0_0_25px_rgba(0,242,254,0.4)]"
+                        >
+                            AI 마인드봇 테스트
+                        </h2>
+                        <p
+                            class="text-xs sm:text-base text-cyan-200/90 font-medium max-w-xl mx-auto text-center"
+                        >
+                            3가지 간단 질문으로 측정하는 내 내면의 AI 브랜딩 결
+                            텍스처
+                        </p>
+                    </div>
+
+                    <div id="quiz-container" class="w-full max-w-xl mx-auto">
+                        <!-- Quiz Active View -->
+                        <div id="quiz-active" class="w-full">
+                            <div class="flex items-center justify-between mb-6">
+                                <div
+                                    class="w-full h-3 bg-gray-950 rounded-full overflow-hidden mr-4 border border-white/10"
+                                >
+                                    <div
+                                        id="quiz-progress"
+                                        class="h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 transition-all duration-300 w-[33.33%] shadow-lg shadow-cyan-500/50"
+                                    ></div>
+                                </div>
+                                <span
+                                    id="quiz-step-text"
+                                    class="text-xs font-mono text-cyan-400 font-bold whitespace-nowrap px-3 py-1 rounded-lg bg-cyan-950/80 border border-cyan-500/30"
+                                    >01 / 03</span
+                                >
+                            </div>
+
+                            <div
+                                id="quiz-content"
+                                class="text-center my-6 w-full"
+                            >
+                                <div
+                                    id="quiz-icon-wrapper"
+                                    class="w-16 h-16 mx-auto mb-4 bg-gray-900 rounded-2xl border border-cyan-500/40 flex items-center justify-center text-2xl text-cyan-400 shadow-lg shadow-cyan-500/20"
+                                >
+                                    <i class="fa-solid fa-compass"></i>
+                                </div>
+                                <h3
+                                    id="quiz-question"
+                                    class="text-base sm:text-xl font-bold text-white leading-snug min-h-[3rem] flex items-center justify-center px-2 text-center"
+                                >
+                                    <!-- Injected Dynamically -->
+                                </h3>
+                            </div>
+
+                            <div id="quiz-options" class="space-y-3 w-full">
+                                <!-- Dynamic Choice Buttons Injected -->
+                            </div>
+
+                            <div class="mt-6 flex justify-start">
+                                <button
+                                    id="quiz-prev-btn"
+                                    onclick="prevQuiz()"
+                                    class="hidden text-xs text-gray-400 hover:text-cyan-400 flex items-center gap-1.5 transition-colors px-2 py-1"
+                                >
+                                    <i
+                                        class="fa-solid fa-arrow-left text-[10px]"
+                                    ></i>
+                                    이전 질문으로 돌아가기
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Quiz Result Screen (Hidden Initially) -->
+                        <div
+                            id="quiz-result"
+                            class="hidden text-center py-2 w-full flex-col items-center"
+                        >
+                            <!-- Neon Glowing Badge -->
+                            <div
+                                id="result-badge-wrapper"
+                                class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-cyan-950/90 border border-cyan-400 text-cyan-300 text-xs font-mono font-extrabold mb-5 shadow-lg shadow-cyan-500/40 tracking-wider uppercase animate-pulse"
+                            >
+                                <span
+                                    class="w-2.5 h-2.5 rounded-full bg-cyan-400"
+                                ></span>
+                                <span id="result-badge-text"
+                                    >DIRECTION SEEKER</span
+                                >
+                            </div>
+
+                            <!-- Central Neon Result Card -->
+                            <div
+                                class="relative w-full max-w-lg mx-auto p-6 sm:p-8 rounded-3xl bg-gray-950/90 border-2 border-cyan-500/50 shadow-[0_0_50px_rgba(0,242,254,0.25)] mb-6 box-border"
+                            >
+                                <span
+                                    class="text-xs text-gray-400 font-mono uppercase tracking-widest block mb-2"
+                                    >Diagnostic Texture Result</span
+                                >
+                                <h3
+                                    id="result-title"
+                                    class="text-2xl sm:text-4xl font-black mb-3 tracking-tight neon-result-cyan"
+                                >
+                                    "당신은 방향을 잃은 사람"
+                                </h3>
+                                <p
+                                    id="result-desc"
+                                    class="text-xs sm:text-sm text-gray-300 leading-relaxed font-light"
+                                >
+                                    내면의 방향성과 가치를 먼저 재정립해야 하는
+                                    상태입니다. 나다움에 맞는 미래 지도 설계가
+                                    시급합니다.
+                                </p>
+                            </div>
+
+                            <!-- 5-Stage Roadmap Flowchart Card -->
+                            <div
+                                class="w-full max-w-xl bg-gray-950/80 rounded-2xl p-5 border border-white/10 mb-6 text-left space-y-3"
+                            >
+                                <div
+                                    class="flex items-center justify-between border-b border-white/10 pb-3"
+                                >
+                                    <span
+                                        class="text-xs font-mono font-bold text-cyan-400 uppercase flex items-center gap-2"
+                                    >
+                                        <i
+                                            class="fa-solid fa-diagram-project"
+                                        ></i>
+                                        <span
+                                            >나만을 위한 3단계 맞춤 로드맵</span
+                                        >
+                                    </span>
+                                    <span
+                                        class="text-[10px] text-gray-500 font-mono"
+                                        >Q1 진단 기반 자동 설계</span
+                                    >
+                                </div>
+
+                                <div
+                                    id="roadmap-flowchart"
+                                    class="grid grid-cols-5 gap-1.5 pt-2 items-center text-center"
+                                >
+                                    <!-- Dynamic 5 steps injected here -->
+                                </div>
+                            </div>
+
+                            <!-- Summary of Answers -->
+                            <div
+                                class="w-full max-w-xl bg-gray-950/60 rounded-xl p-4 border border-cyan-500/20 mb-6 text-left text-xs text-gray-300 space-y-2"
+                            >
+                                <div
+                                    class="text-[10px] font-mono font-bold text-cyan-400 uppercase border-b border-white/10 pb-2 flex justify-between"
+                                >
+                                    <span>내 3가지 질문 응답 기록</span>
+                                    <span>신청서 자동 첨부됨</span>
+                                </div>
+                                <div
+                                    id="quiz-summary-list"
+                                    class="space-y-1.5 text-[11px]"
+                                >
+                                    <!-- Injected by JS -->
+                                </div>
+                            </div>
+
+                            <button
+                                onclick="scrollToForm()"
+                                class="btn-neon-primary rounded-xl py-4 px-8 text-xs font-black tracking-wide flex items-center justify-center gap-2 mx-auto shadow-lg shadow-cyan-500/20"
+                            >
+                                <span>1:1 AI 퍼스널 코칭 신청서 작성하기</span>
+                                <i class="fa-solid fa-arrow-down text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- COACHING APPLICATION FORM -->
+                <section
+                    id="coaching-form"
+                    class="w-full glass-card rounded-3xl p-6 sm:p-10 border border-white/10 shadow-2xl relative overflow-hidden box-border"
+                >
+                    <div
+                        class="text-center mb-8 w-full flex flex-col items-center"
+                    >
+                        <div
+                            class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-950/80 border border-purple-500/30 text-purple-300 text-xs font-mono font-semibold mb-3"
+                        >
+                            <i class="fa-solid fa-paper-plane text-[10px]"></i>
+                            1:1 MATCHING APPLICATION
+                        </div>
+                        <h3
+                            class="text-2xl sm:text-3xl font-black text-white mb-2"
+                        >
+                            마인드봇 AI 코칭 신청서
+                        </h3>
+                        <p
+                            class="text-xs sm:text-sm text-gray-400 font-light max-w-md mx-auto text-center"
+                        >
+                            기본 정보를 작성해 주시면 진단된 결과 및 5단계
+                            로드맵이 담당 코치에게 안전하게 전달됩니다.
+                        </p>
+                    </div>
+
+                    <form
+                        onsubmit="handleClientSubmit(event)"
+                        class="space-y-5 relative z-10 w-full max-w-lg mx-auto box-border"
+                    >
+                        <!-- Name -->
+                        <div class="w-full">
+                            <label
+                                class="block text-xs font-semibold text-gray-300 mb-2 flex justify-between"
+                            >
+                                <span
+                                    >이름
+                                    <span class="text-cyan-400">*</span></span
+                                >
+                                <span class="text-[11px] text-gray-500"
+                                    >실명 또는 활동명</span
+                                >
+                            </label>
+                            <input
+                                type="text"
+                                id="input-name"
+                                required
+                                class="input-tech text-xs sm:text-sm"
+                                placeholder="예: 김소연"
+                            />
+                        </div>
+
+                        <!-- Age -->
+                        <div class="w-full">
+                            <label
+                                class="block text-xs font-semibold text-gray-300 mb-2"
+                            >
+                                나이 <span class="text-cyan-400">*</span>
+                            </label>
+                            <input
+                                type="number"
+                                id="input-age"
+                                min="15"
+                                max="100"
+                                required
+                                class="input-tech text-xs sm:text-sm"
+                                placeholder="예: 28"
+                            />
+                        </div>
+
+                        <!-- Location -->
+                        <div class="w-full">
+                            <label
+                                class="block text-xs font-semibold text-gray-300 mb-2"
+                            >
+                                사는 곳 (지역/도시)
+                                <span class="text-cyan-400">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="input-location"
+                                required
+                                class="input-tech text-xs sm:text-sm"
+                                placeholder="예: 서울시 마포구 / 경기 성남시"
+                            />
+                        </div>
+
+                        <!-- Available Time -->
+                        <div class="w-full">
+                            <label
+                                class="block text-xs font-semibold text-gray-300 mb-2"
+                            >
+                                상담 가능 시간
+                                <span class="text-cyan-400">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="input-time"
+                                required
+                                class="input-tech text-xs sm:text-sm"
+                                placeholder="예: 평일 저녁 7시 이후 또는 주말 오전"
+                            />
+                        </div>
+
+                        <!-- Phone Number (Strict real-time numeric sanitizer) -->
+                        <div class="w-full">
+                            <label
+                                class="block text-xs font-semibold text-gray-300 mb-2 flex justify-between items-center"
+                            >
+                                <span
+                                    >연락처 (전화번호)
+                                    <span class="text-cyan-400">*</span></span
+                                >
+                                <span
+                                    class="text-[10px] text-cyan-400 font-mono"
+                                    >숫자만 자동 정제 (하이픈 제거)</span
+                                >
+                            </label>
+                            <input
+                                type="tel"
+                                id="input-phone"
+                                required
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                class="input-tech text-xs sm:text-sm font-mono tracking-wider"
+                                placeholder="01012345678 (- 없이 숫자만 입력)"
+                            />
+                        </div>
+
+                        <!-- Auto-Attached Diagnosis Status Box -->
+                        <div
+                            id="survey-attached-badge"
+                            class="p-4 bg-cyan-950/50 border border-cyan-500/30 rounded-2xl flex items-center justify-between text-xs text-gray-300"
+                        >
+                            <div class="flex items-center gap-3">
+                                <i
+                                    class="fa-solid fa-circle-check text-cyan-400 text-xl"
+                                ></i>
+                                <div>
+                                    <div class="font-bold text-white text-xs">
+                                        내면 결 진단 데이터 자동 첨부
+                                    </div>
+                                    <div
+                                        id="attached-archetype-name"
+                                        class="text-[11px] text-cyan-300 font-medium"
+                                    >
+                                        유형: 당신은 방향을 잃은 사람
+                                    </div>
+                                </div>
+                            </div>
+                            <span
+                                class="font-mono text-[10px] px-2.5 py-1 rounded bg-cyan-900/80 text-cyan-300 border border-cyan-400/40 font-bold"
+                                >3/3 완료</span
+                            >
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="pt-3 w-full">
+                            <button
+                                type="submit"
+                                class="btn-neon-primary w-full rounded-2xl py-4 text-xs sm:text-sm font-black tracking-wider flex items-center justify-center gap-2"
+                            >
+                                <span>마인드봇 코칭 여정 시작하기</span>
+                                <i class="fa-solid fa-paper-plane text-xs"></i>
+                            </button>
+                            <p
+                                class="text-center text-[11px] text-gray-500 mt-3 font-light flex items-center justify-center gap-1.5"
+                            >
+                                <i
+                                    class="fa-solid fa-lock text-[10px] text-cyan-400"
+                                ></i>
+                                <span
+                                    >제출된 정보는 관리자 대시보드 시스템으로
+                                    실시간 전달됩니다.</span
+                                >
+                            </p>
+                        </div>
+                    </form>
+                </section>
+
+                <footer
+                    class="text-center text-xs text-gray-500 pt-4 pb-8 border-t border-white/5 font-mono w-full"
+                >
+                    © 2026 MIND-BOT PROJECT x TEXTURE OF ME. ALL RIGHTS
+                    RESERVED.
+                </footer>
+            </div>
+
+            <!-- ADMIN DASHBOARD VIEW SECTION -->
+            <div
+                id="admin-view"
+                class="view-section hidden w-full max-w-6xl mx-auto px-4 sm:px-8 py-8 flex flex-col gap-6"
+            >
+                <!-- Dashboard Header Bar & Action Toolbar (IMPORTANT: Data Restore Removed completely) -->
+                <div
+                    class="glass-card p-6 rounded-3xl border border-cyan-500/30 shadow-xl flex flex-col lg:flex-row lg:items-center justify-between gap-4"
+                >
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span
+                                class="px-3 py-1 bg-cyan-950 text-cyan-400 border border-cyan-500/30 text-[11px] font-mono font-bold rounded-full flex items-center gap-1.5"
+                            >
+                                <span
+                                    class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"
+                                ></span>
+                                SYSTEM ONLINE
+                            </span>
+                            <h2
+                                class="text-xl sm:text-2xl font-black text-white"
+                            >
+                                통합 관리자 대시보드
+                            </h2>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">
+                            신청 내역을 수신받아 코치를 배정하고, TM 진행
+                            상태("티엠예정", "티엠완료")를 관리합니다.
+                        </p>
+                    </div>
+
+                    <!-- Management Action Control Buttons (Restore Removed) -->
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <!-- Excel Download -->
+                        <button
+                            onclick="exportToExcel()"
+                            class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-emerald-600/20"
+                        >
+                            <i class="fa-solid fa-file-excel text-sm"></i>
+                            <span>📊 엑셀 다운로드</span>
+                        </button>
+
+                        <!-- Base64 Hash Link Share Button -->
+                        <button
+                            onclick="generateShareableLink()"
+                            class="bg-cyan-600 hover:bg-cyan-500 text-white px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-cyan-600/20"
+                            title="현재 상태를 URL Hash로 생성하여 클립보드에 복사"
+                        >
+                            <i class="fa-solid fa-link text-sm"></i>
+                            <span>🔗 링크로 저장/공유</span>
+                        </button>
+
+                        <!-- JSON Backup Download -->
+                        <button
+                            onclick="backupDataJSON()"
+                            class="bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-indigo-600/20"
+                        >
+                            <i class="fa-solid fa-download text-sm"></i>
+                            <span>📥 백업 다운로드</span>
+                        </button>
+
+                        <!-- Demo Reset -->
+                        <button
+                            onclick="openResetModal()"
+                            class="bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-500/30 px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"
+                        >
+                            <i class="fa-solid fa-rotate-left text-xs"></i>
+                            <span>🔄 데모 데이터 리셋</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Metrics Summary Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
+                    <div
+                        class="glass-card p-5 rounded-2xl border border-white/10"
+                    >
+                        <div
+                            class="text-xs text-gray-400 font-medium flex items-center justify-between"
+                        >
+                            <span>총 신청 건수</span>
+                            <i class="fa-solid fa-database text-gray-500"></i>
+                        </div>
+                        <div
+                            id="stat-total"
+                            class="text-3xl font-mono font-black text-white mt-2"
+                        >
+                            0건
+                        </div>
+                    </div>
+                    <div
+                        class="glass-card p-5 rounded-2xl border border-amber-500/30 bg-amber-950/10"
+                    >
+                        <div
+                            class="text-xs text-amber-400 font-medium flex items-center justify-between"
+                        >
+                            <span>티엠예정 (미처리)</span>
+                            <i
+                                class="fa-solid fa-headset text-amber-500/60"
+                            ></i>
+                        </div>
+                        <div
+                            id="stat-pending"
+                            class="text-3xl font-mono font-black text-amber-400 mt-2"
+                        >
+                            0건
+                        </div>
+                    </div>
+                    <div
+                        class="glass-card p-5 rounded-2xl border border-emerald-500/30 bg-emerald-950/10"
+                    >
+                        <div
+                            class="text-xs text-emerald-400 font-medium flex items-center justify-between"
+                        >
+                            <span>티엠완료</span>
+                            <i
+                                class="fa-solid fa-circle-check text-emerald-500/60"
+                            ></i>
+                        </div>
+                        <div
+                            id="stat-completed"
+                            class="text-3xl font-mono font-black text-emerald-400 mt-2"
+                        >
+                            0건
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters & Live Search Bar -->
+                <div
+                    class="glass-card p-4 rounded-2xl border border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 w-full"
+                >
+                    <div
+                        class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0"
+                    >
+                        <button
+                            onclick="filterStatus('all')"
+                            id="filter-all"
+                            class="filter-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-cyan-400 text-gray-950 whitespace-nowrap shadow-md shadow-cyan-400/20"
+                        >
+                            전체 보기
+                        </button>
+                        <button
+                            onclick="filterStatus('티엠예정')"
+                            id="filter-pending"
+                            class="filter-tab-btn px-4 py-2 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 whitespace-nowrap"
+                        >
+                            티엠예정건
+                        </button>
+                        <button
+                            onclick="filterStatus('티엠완료')"
+                            id="filter-completed"
+                            class="filter-tab-btn px-4 py-2 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 whitespace-nowrap"
+                        >
+                            티엠완료건
+                        </button>
+                    </div>
+
+                    <div class="relative w-full md:w-80">
+                        <i
+                            class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-gray-400"
+                        ></i>
+                        <input
+                            type="text"
+                            id="admin-search-input"
+                            onkeyup="handleSearch()"
+                            class="input-tech w-full pl-9 py-2 text-xs"
+                            placeholder="이름 또는 연락처 검색..."
+                        />
+                    </div>
+                </div>
+
+                <!-- MAIN LAYOUT GRID (Applicant Table Left + Dynamic Coach Manager Right) -->
+                <div
+                    class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full"
+                >
+                    <!-- Applicants Table (Cols 8) -->
+                    <div
+                        class="lg:col-span-8 glass-card rounded-2xl border border-white/10 overflow-hidden shadow-2xl w-full"
+                    >
+                        <div
+                            class="p-4 bg-gray-950/50 border-b border-white/10 flex items-center justify-between"
+                        >
+                            <div class="flex items-center gap-2">
+                                <i
+                                    class="fa-solid fa-users text-cyan-400 text-xs"
+                                ></i>
+                                <h3
+                                    class="text-xs font-mono font-bold text-gray-200 uppercase tracking-wider"
+                                >
+                                    신청 내역 목록
+                                </h3>
+                            </div>
+                            <span
+                                id="table-count-label"
+                                class="text-xs font-mono text-gray-400"
+                                >총 0건</span
+                            >
+                        </div>
+
+                        <div class="overflow-x-auto w-full">
+                            <table
+                                class="w-full text-left text-xs text-gray-200"
+                            >
+                                <thead
+                                    class="bg-gray-950/80 border-b border-white/10 text-gray-400 font-mono text-[11px] uppercase tracking-wider"
+                                >
+                                    <tr>
+                                        <th class="p-4 whitespace-nowrap">
+                                            ID / 일시
+                                        </th>
+                                        <th class="p-4 whitespace-nowrap">
+                                            신청자 정보
+                                        </th>
+                                        <th class="p-4 whitespace-nowrap">
+                                            진단 유형
+                                        </th>
+                                        <th class="p-4 whitespace-nowrap">
+                                            담당 코치
+                                        </th>
+                                        <th class="p-4 whitespace-nowrap">
+                                            상태
+                                        </th>
+                                        <th
+                                            class="p-4 text-center whitespace-nowrap"
+                                        >
+                                            제어
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody
+                                    id="app-list-tbody"
+                                    class="divide-y divide-white/5 font-sans"
+                                >
+                                    <!-- Injected dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div
+                            id="empty-state"
+                            class="hidden p-12 text-center text-gray-500"
+                        >
+                            <i
+                                class="fa-solid fa-inbox text-4xl mb-3 text-gray-600"
+                            ></i>
+                            <p class="text-sm font-medium">
+                                조건에 맞는 신청 내역이 없습니다.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Coach Manager Panel (Cols 4) -->
+                    <div
+                        class="lg:col-span-4 glass-card p-5 rounded-2xl border border-purple-500/30 shadow-2xl space-y-4 w-full"
+                    >
+                        <div
+                            class="flex items-center justify-between pb-3 border-b border-white/10"
+                        >
+                            <div class="flex items-center gap-2">
+                                <div
+                                    class="w-8 h-8 rounded-xl bg-purple-950 border border-purple-500/40 flex items-center justify-center text-purple-400 text-xs"
+                                >
+                                    <i class="fa-solid fa-user-gear"></i>
+                                </div>
+                                <h3 class="text-sm font-bold text-white">
+                                    담당 코치 관리 (Coach Manager)
+                                </h3>
+                            </div>
+                            <span
+                                class="text-[10px] font-mono text-purple-400 bg-purple-950 px-2 py-0.5 rounded border border-purple-500/30 font-bold"
+                                >LIVE SYNC</span
+                            >
+                        </div>
+
+                        <p
+                            class="text-xs text-gray-400 leading-relaxed font-light"
+                        >
+                            코치를 새로 등록하거나 삭제할 수 있습니다. 삭제된
+                            코치의 담당건은 즉시
+                            <span class="text-amber-400 font-semibold"
+                                >'미배정'</span
+                            >으로 자동 전환됩니다.
+                        </p>
+
+                        <!-- Add Coach Form -->
+                        <form
+                            onsubmit="handleAddCoach(event)"
+                            class="flex gap-2 w-full"
+                        >
+                            <input
+                                type="text"
+                                id="input-coach-name"
+                                required
+                                class="input-tech text-xs flex-grow py-2.5"
+                                placeholder="새 코치 이름 (예: 수현 코치)"
+                            />
+                            <button
+                                type="submit"
+                                class="btn-neon-primary px-3.5 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1"
+                            >
+                                <i class="fa-solid fa-plus text-[10px]"></i>
+                                <span>+ 등록</span>
+                            </button>
+                        </form>
+
+                        <!-- Coach List -->
+                        <div class="space-y-2 pt-2 w-full">
+                            <div
+                                class="text-[11px] font-mono text-gray-400 uppercase tracking-wider flex justify-between"
+                            >
+                                <span>등록된 코치 목록</span>
+                                <span
+                                    id="coach-total-count"
+                                    class="text-purple-400 font-bold"
+                                    >0명</span
+                                >
+                            </div>
+
+                            <div
+                                id="coach-list-container"
+                                class="space-y-2 max-h-64 overflow-y-auto pr-1"
+                            >
+                                <!-- Dynamically Injected Cards -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- MODAL 1: Applicant Detail View Modal -->
+        <div
+            id="detail-modal"
+            class="fixed inset-0 z-[100] modal-overlay flex items-center justify-center p-4"
+        >
+            <div
+                class="glass-card rounded-3xl p-6 sm:p-8 max-w-xl w-full border border-cyan-500/40 shadow-2xl relative max-h-[90vh] flex flex-col box-border"
+            >
+                <button
+                    onclick="closeDetailModal()"
+                    class="absolute top-5 right-5 text-gray-400 hover:text-white transition-colors"
+                >
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+
+                <div class="flex items-center gap-2 mb-2">
+                    <span
+                        class="px-3 py-0.5 bg-cyan-950 text-cyan-400 border border-cyan-500/30 font-mono font-bold text-[11px] rounded-full"
+                        >APPLICANT DETAIL</span
+                    >
+                    <span
+                        id="modal-date"
+                        class="text-xs font-mono text-gray-400"
+                        >2026-09-15 14:20</span
+                    >
+                </div>
+
+                <h3
+                    id="modal-name-title"
+                    class="text-xl font-bold text-white mb-4"
+                >
+                    김소연 님 (28세)
+                </h3>
+
+                <div class="overflow-y-auto pr-1 space-y-4 flex-grow">
+                    <!-- Contact Summary -->
+                    <div
+                        class="space-y-2 bg-gray-950/80 p-4 rounded-2xl border border-white/10 text-xs"
+                    >
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">거주 지역:</span>
+                            <span
+                                id="modal-location"
+                                class="font-semibold text-gray-200"
+                                >서울시 마포구</span
+                            >
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">연락처:</span>
+                            <span
+                                id="modal-phone"
+                                class="font-mono font-bold text-cyan-400"
+                                >01012345678</span
+                            >
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">상담 가능 시간:</span>
+                            <span
+                                id="modal-time"
+                                class="font-semibold text-gray-200"
+                                >평일 저녁 7시 이후</span
+                            >
+                        </div>
+                        <div
+                            class="flex justify-between items-center pt-2 border-t border-white/5"
+                        >
+                            <span class="text-gray-400">담당 코치:</span>
+                            <span
+                                id="modal-coach"
+                                class="font-bold text-purple-400 bg-purple-950/80 px-2.5 py-0.5 rounded border border-purple-500/30"
+                                >소연 코치</span
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Diagnosis Summary -->
+                    <div
+                        class="bg-gray-950/90 rounded-2xl p-4 border border-cyan-500/30 space-y-2"
+                    >
+                        <div
+                            class="flex items-center justify-between border-b border-white/10 pb-2"
+                        >
+                            <span
+                                class="text-xs font-mono font-bold text-cyan-400 uppercase flex items-center gap-1.5"
+                            >
+                                <i class="fa-solid fa-lightbulb"></i>
+                                <span>진단 결과 & 맞춤 로드맵</span>
+                            </span>
+                            <span
+                                id="modal-archetype-badge"
+                                class="text-[10px] text-cyan-300 font-extrabold bg-cyan-950 px-2 py-0.5 rounded border border-cyan-500/30"
+                                >DIRECTION SEEKER</span
+                            >
+                        </div>
+
+                        <div
+                            class="text-sm font-bold text-cyan-200 pt-1"
+                            id="modal-archetype-title"
+                        >
+                            "당신은 방향을 잃은 사람"
+                        </div>
+
+                        <!-- 5 Steps Flowchart -->
+                        <div
+                            id="modal-roadmap-flow"
+                            class="grid grid-cols-5 gap-1 text-center text-[10px] pt-2"
+                        >
+                            <!-- Dynamic modal roadmap -->
+                        </div>
+                    </div>
+
+                    <!-- Q1~Q3 Survey Answers -->
+                    <div
+                        class="bg-gray-950/90 rounded-2xl p-4 border border-white/10 space-y-2"
+                    >
+                        <div
+                            class="flex items-center justify-between border-b border-white/10 pb-2"
+                        >
+                            <span
+                                class="text-xs font-mono font-bold text-gray-300 uppercase flex items-center gap-1.5"
+                            >
+                                <i
+                                    class="fa-solid fa-list-check text-cyan-400"
+                                ></i>
+                                <span>진단 응답 내역 (Q1 ~ Q3)</span>
+                            </span>
+                        </div>
+
+                        <div
+                            id="modal-survey-answers"
+                            class="space-y-2 pt-1 text-xs"
+                        >
+                            <!-- Injected Q1-Q3 Answers -->
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="flex gap-2 justify-end pt-4 mt-3 border-t border-white/10"
+                >
+                    <button
+                        onclick="closeDetailModal()"
+                        class="btn-tech-secondary px-4 py-2 rounded-xl text-xs font-bold"
+                    >
+                        닫기
+                    </button>
+                    <button
+                        id="modal-delete-btn"
+                        onclick="deleteCurrentItem()"
+                        class="px-4 py-2 bg-rose-950/80 border border-rose-500/30 text-rose-300 hover:bg-rose-900 rounded-xl text-xs font-bold transition-colors"
+                    >
+                        <i class="fa-solid fa-trash-can mr-1"></i> 삭제
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL 2: Client Submission Success Notification -->
+        <div
+            id="success-modal"
+            class="fixed inset-0 z-[100] modal-overlay flex items-center justify-center p-4"
+        >
+            <div
+                class="glass-card rounded-3xl p-7 max-w-md w-full text-center border border-cyan-500/50 shadow-2xl relative"
+            >
+                <div
+                    class="w-16 h-16 bg-gradient-to-tr from-cyan-400 to-indigo-500 p-[1px] rounded-full mx-auto mb-4 shadow-lg shadow-cyan-500/30"
+                >
+                    <div
+                        class="w-full h-full bg-gray-950 rounded-full flex items-center justify-center text-2xl text-cyan-400"
+                    >
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                </div>
+
+                <span
+                    class="px-3 py-0.5 bg-cyan-950 text-cyan-300 font-mono text-[10px] rounded-full border border-cyan-500/30 uppercase font-bold"
+                    >TRANSMITTED TO SYSTEM</span
+                >
+                <h3 class="text-xl font-bold text-white mt-2 mb-2">
+                    신청이 성공적으로 접수되었습니다!
+                </h3>
+
+                <p
+                    class="text-xs text-gray-300 leading-relaxed mb-6 bg-gray-950/80 p-4 rounded-xl border border-white/5 text-left"
+                >
+                    작성해주신 정보와
+                    <strong class="text-cyan-400"
+                        >3가지 진단 결과 및 맞춤 로드맵</strong
+                    >
+                    데이터가
+                    <strong class="text-white">통합 관리자 대시보드</strong>로
+                    전달되었습니다.<br />
+                    담당 코치 확인 후 작성해주신 연락처로 안내드립니다.
+                </p>
+
+                <button
+                    onclick="closeSuccessModal()"
+                    class="btn-neon-primary w-full py-3.5 rounded-xl text-xs font-bold tracking-wide"
+                >
+                    확인 및 관리자 대시보드로 이동
+                </button>
+            </div>
+        </div>
+
+        <!-- MODAL 3: Demo Data Reset Confirmation Modal -->
+        <div
+            id="reset-modal"
+            class="fixed inset-0 z-[100] modal-overlay flex items-center justify-center p-4"
+        >
+            <div
+                class="glass-card rounded-3xl p-7 max-w-md w-full text-center border border-rose-500/50 shadow-2xl relative"
+            >
+                <div
+                    class="w-14 h-14 bg-rose-950/80 border border-rose-500/40 rounded-full flex items-center justify-center text-rose-400 text-2xl mx-auto mb-4"
+                >
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+
+                <h3 class="text-lg font-bold text-white mb-2">
+                    데모 데이터를 초기화하시겠습니까?
+                </h3>
+                <p
+                    class="text-xs text-gray-300 leading-relaxed mb-6 bg-gray-950/80 p-4 rounded-xl border border-white/5"
+                >
+                    현재 저장된 모든 신청 내역 및 코치 목록이 초기 데모 상태로
+                    리셋됩니다. 계속하시겠습니까?
+                </p>
+
+                <div class="flex gap-2">
+                    <button
+                        onclick="closeResetModal()"
+                        class="btn-tech-secondary flex-1 py-3 rounded-xl text-xs font-bold"
+                    >
+                        취소
+                    </button>
+                    <button
+                        onclick="confirmResetData()"
+                        class="bg-rose-600 hover:bg-rose-500 text-white font-bold flex-1 py-3 rounded-xl text-xs transition-all shadow-lg shadow-rose-600/20"
+                    >
+                        초기화 실행
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOAST NOTIFICATION CONTAINER -->
+        <div
+            id="toast-notification"
+            class="fixed bottom-6 right-6 z-[120] bg-gray-900 border border-cyan-400/80 text-white px-5 py-3.5 rounded-2xl shadow-2xl shadow-cyan-500/30 flex items-center gap-3 text-xs font-medium"
+        >
+            <div
+                class="w-8 h-8 rounded-xl bg-cyan-950 border border-cyan-400 flex items-center justify-center text-cyan-400 text-sm"
+            >
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <span id="toast-message">알림 메시지</span>
+        </div>
+
+        <script>
+            /* LOCAL STORAGE KEYS */
+            var LS_KEY_APPS = "mindbot_texture_apps_2026";
+            var LS_KEY_COACHES = "mindbot_texture_coaches_2026";
+
+            /* INITIAL DEFAULT DEMO COACHES */
+            var defaultCoaches = [
+                "미배정",
+                "소연 코치",
+                "지은 코치",
+                "민우 코치",
+                "AI 전담 디렉터",
+            ];
+
+            /* 3 DIAGNOSTIC QUESTIONS & OPTIONS DEFINITION */
+            var quizData = [
+                {
+                    qNum: 1,
+                    icon: "fa-solid fa-compass",
+                    q: "Q1. 지금 나에게 가장 가까운 것은?",
+                    options: [
+                        "1. 무엇을 해야 할지 모르겠다",
+                        "2. 해야 할 건 알지만 실행이 어렵다",
+                        "3. 시작은 하지만 지속하기 어렵다",
+                        "4. 지금보다 더 성장하고 싶다",
+                    ],
+                },
+                {
+                    qNum: 2,
+                    icon: "fa-solid fa-puzzle-piece",
+                    q: "Q2. 내가 지금 가장 어려움을 느끼는 이유는?",
+                    options: [
+                        "1. 내가 무엇을 원하는지 명확하지 않다",
+                        "2. 계획을 세워도 행동으로 옮기기 어렵다",
+                        "3. 의지는 있지만 금방 흐지부지된다",
+                        "4. 혼자서는 내가 제대로 하고 있는지 판단하기 어렵다",
+                    ],
+                },
+                {
+                    qNum: 3,
+                    icon: "fa-solid fa-hand-holding-heart",
+                    q: "Q3. 누군가가 나를 도와준다면 가장 필요한 것은?",
+                    options: [
+                        "1. 나에게 맞는 방향을 찾는 것",
+                        "2. 목표를 구체적으로 만들고 실행하는 것",
+                        "3. 꾸준히 할 수 있도록 점검받는 것",
+                        "4. 나의 가능성과 다음 성장 단계를 발견하는 것",
+                    ],
+                },
+            ];
+
+            /* RESULT ARCHETYPE MAPPING DIRECTLY FROM Q1 SELECTION */
+            var archetypeMap = {
+                0: {
+                    badge: "DIRECTION SEEKER",
+                    title: '"당신은 방향을 잃은 사람"',
+                    desc: "내면의 방향성과 가치를 먼저 재정립해야 하는 상태입니다. 나다움에 맞는 미래 지도 설계가 시급합니다.",
+                    steps: [
+                        "자기이해",
+                        "가치 발견",
+                        "원하는 삶",
+                        "방향 설정",
+                        "목표 설정",
+                    ],
+                    titleClass: "neon-result-cyan",
+                    badgeClass:
+                        "bg-cyan-950/90 text-cyan-300 border-cyan-400 shadow-cyan-500/40",
+                },
+                1: {
+                    badge: "ACTION SEEKER",
+                    title: '"당신은 실행이 어려운 사람"',
+                    desc: "생각의 무게가 과도하여 시작의 거부감이 큽니다. 부담을 허무는 원자 단위 실행 설계가 필요합니다.",
+                    steps: [
+                        "목표 구체화",
+                        "행동 쪼개기",
+                        "실행 장벽 찾기",
+                        "즉시 행동",
+                        "피드백",
+                    ],
+                    titleClass: "neon-result-amber",
+                    badgeClass:
+                        "bg-amber-950/90 text-amber-300 border-amber-400 shadow-amber-500/40",
+                },
+                2: {
+                    badge: "PERSISTENCE SEEKER",
+                    title: '"당신은 지속이 어려운 사람"',
+                    desc: "초기 동력은 높으나 습관화 및 환경적 지지 구조가 미비합니다. 지속가능한 자동화 루틴이 필요합니다.",
+                    steps: [
+                        "작은 목표",
+                        "습관 설계",
+                        "환경 설정",
+                        "실행 점검",
+                        "지속 시스템",
+                    ],
+                    titleClass: "neon-result-purple",
+                    badgeClass:
+                        "bg-purple-950/90 text-purple-300 border-purple-400 shadow-purple-500/40",
+                },
+                3: {
+                    badge: "GROWTH ACCELERATOR",
+                    title: '"당신은 성장 정체를 느끼는 사람"',
+                    desc: "현재의 성과에 안주하지 않고 다음 단계의 임팩트를 원합니다. 강점 기반 퀀텀 딥 가속이 필요한 시점입니다.",
+                    steps: [
+                        "현재 진단",
+                        "강점 발견",
+                        "잠재력 탐색",
+                        "새로운 목표",
+                        "성장 프로젝트",
+                    ],
+                    titleClass: "neon-result-emerald",
+                    badgeClass:
+                        "bg-emerald-950/90 text-emerald-300 border-emerald-400 shadow-emerald-500/40",
+                },
+            };
+
+            /* INITIAL DEMO APPLICATIONS */
+            var defaultApplications = [];
+
+            /* APP GLOBAL STATE */
+            var coaches = [];
+            var applications = [];
+            var userAnswers = [null, null, null];
+            var quizStep = 0;
+            var selectedQ1OptionIndex = 0;
+            var currentFilter = "all";
+            var searchQuery = "";
+            var selectedItemId = null;
+
+            /* TOAST NOTIFICATION HELPER */
+            function showToast(message) {
+                var toast = document.getElementById("toast-notification");
+                var toastMsg = document.getElementById("toast-message");
+                if (!toast || !toastMsg) return;
+
+                toastMsg.innerText = message;
+                toast.classList.add("show");
+                setTimeout(function () {
+                    toast.classList.remove("show");
+                }, 3200);
+            }
+
+            /* STATE STORAGE & URL HASH SERIALIZATION */
+            function loadState() {
+                try {
+                    // First check if state exists in URL Hash (#state=...)
+                    if (
+                        window.location.hash &&
+                        window.location.hash.indexOf("#state=") === 0
+                    ) {
+                        var base64Data = window.location.hash.replace(
+                            "#state=",
+                            ""
+                        );
+                        if (base64Data) {
+                            var jsonStr = decodeURIComponent(
+                                escape(atob(base64Data))
+                            );
+                            var parsed = JSON.parse(jsonStr);
+                            if (parsed.coaches && parsed.applications) {
+                                coaches = parsed.coaches;
+                                applications = parsed.applications;
+                                saveState();
+                                showToast(
+                                    "🔗 URL 공유 링크로부터 데이터 상태를 불러왔습니다!"
+                                );
+                                return;
+                            }
+                        }
+                    }
+
+                    var savedCoaches = localStorage.getItem(LS_KEY_COACHES);
+                    if (savedCoaches) {
+                        coaches = JSON.parse(savedCoaches);
+                    } else {
+                        coaches = defaultCoaches.slice();
+                    }
+
+                    var savedApps = localStorage.getItem(LS_KEY_APPS);
+                    if (savedApps) {
+                        applications = JSON.parse(savedApps);
+                    } else {
+                        applications = defaultApplications.slice();
+                    }
+                } catch (e) {
+                    coaches = defaultCoaches.slice();
+                    applications = defaultApplications.slice();
+                }
+            }
+
+            function saveState() {
+                try {
+                    localStorage.setItem(
+                        LS_KEY_COACHES,
+                        JSON.stringify(coaches)
+                    );
+                    localStorage.setItem(
+                        LS_KEY_APPS,
+                        JSON.stringify(applications)
+                    );
+                } catch (e) {}
+            }
+
+            /* GENERATE SHAREABLE BASE64 LINK */
+            function generateShareableLink() {
+                try {
+                    var statePayload = {
+                        coaches: coaches,
+                        applications: applications,
+                    };
+                    var jsonStr = JSON.stringify(statePayload);
+                    var base64Data = btoa(
+                        unescape(encodeURIComponent(jsonStr))
+                    );
+
+                    var baseUrl = window.location.href.split("#")[0];
+                    var shareUrl = baseUrl + "#state=" + base64Data;
+
+                    // Copy to clipboard fallback mechanism
+                    var tempInput = document.createElement("textarea");
+                    tempInput.value = shareUrl;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(tempInput);
+
+                    showToast(
+                        "🔗 데이터가 포함된 공유 링크가 클립보드에 복사되었습니다!"
+                    );
+                } catch (e) {
+                    showToast("⚠️ 링크 생성 중 오류가 발생했습니다.");
+                }
+            }
+
+            /* VIEW NAVIGATION SWITCHER */
+            function switchView(viewName) {
+                var clientView = document.getElementById("client-view");
+                var adminView = document.getElementById("admin-view");
+                var navClientBtn = document.getElementById("nav-client-btn");
+                var navAdminBtn = document.getElementById("nav-admin-btn");
+
+                if (viewName === "client") {
+                    clientView.classList.remove("hidden");
+                    clientView.classList.add("flex");
+                    adminView.classList.add("hidden");
+
+                    navClientBtn.className =
+                        "flex-1 sm:flex-none px-4 py-2 rounded-xl transition-all duration-200 btn-neon-primary flex items-center justify-center gap-1.5 text-xs";
+                    navAdminBtn.className =
+                        "flex-1 sm:flex-none px-4 py-2 rounded-xl transition-all duration-200 text-gray-400 hover:text-white flex items-center justify-center gap-1.5 relative text-xs";
+                } else {
+                    clientView.classList.add("hidden");
+                    clientView.classList.remove("flex");
+                    adminView.classList.remove("hidden");
+
+                    navAdminBtn.className =
+                        "flex-1 sm:flex-none px-4 py-2 rounded-xl transition-all duration-200 btn-neon-primary flex items-center justify-center gap-1.5 relative text-xs";
+                    navClientBtn.className =
+                        "flex-1 sm:flex-none px-4 py-2 rounded-xl transition-all duration-200 text-gray-400 hover:text-white flex items-center justify-center gap-1.5 text-xs";
+
+                    renderAdminDashboard();
+                }
+            }
+
+            function switchFullscreen() {
+                document.documentElement.requestFullscreen();
+            }
+
+            document.addEventListener("fullscreenchange", () => {
+                var fullscreenBtn = document.getElementById("fullscreen-btn");
+                if (document.fullscreenElement) {
+                    fullscreenBtn.style.display = "none"; // 전체화면 진입 시 버튼 숨김
+                } else {
+                    fullscreenBtn.style.display = "block"; // 전체화면 해제 시 버튼 표시
+                }
+            });
+
+            /* QUIZ COMPONENT LOGIC */
+            function renderQuizStep(stepIdx) {
+                var quizProgress = document.getElementById("quiz-progress");
+                var quizStepText = document.getElementById("quiz-step-text");
+                var quizQuestion = document.getElementById("quiz-question");
+                var quizIcon = document.getElementById("quiz-icon-wrapper");
+                var quizOptionsContainer =
+                    document.getElementById("quiz-options");
+                var prevBtn = document.getElementById("quiz-prev-btn");
+
+                if (stepIdx < quizData.length) {
+                    document
+                        .getElementById("quiz-active")
+                        .classList.remove("hidden");
+                    document
+                        .getElementById("quiz-result")
+                        .classList.add("hidden");
+                    document
+                        .getElementById("quiz-result")
+                        .classList.remove("flex");
+
+                    var progressPct = ((stepIdx + 1) / quizData.length) * 100;
+                    quizProgress.style.width = progressPct + "%";
+                    quizStepText.innerText = "0" + (stepIdx + 1) + " / 03";
+
+                    var cur = quizData[stepIdx];
+                    quizIcon.innerHTML = '<i class="' + cur.icon + '"></i>';
+                    quizQuestion.innerText = cur.q;
+
+                    if (stepIdx > 0) {
+                        prevBtn.classList.remove("hidden");
+                    } else {
+                        prevBtn.classList.add("hidden");
+                    }
+
+                    quizOptionsContainer.innerHTML = "";
+                    cur.options.forEach(function (optText, idx) {
+                        var btn = document.createElement("button");
+                        btn.type = "button";
+                        btn.onclick = function () {
+                            answerQuiz(idx);
+                        };
+
+                        var isSelected = userAnswers[stepIdx] === optText;
+
+                        btn.className =
+                            "w-full glass-card border rounded-2xl p-4 text-xs sm:text-sm text-left font-medium transition-all flex items-center justify-between group box-border " +
+                            (isSelected
+                                ? "bg-cyan-950/80 border-cyan-400 text-white shadow-lg shadow-cyan-500/20"
+                                : "hover:bg-cyan-950/40 border-white/10 hover:border-cyan-400/50 text-gray-200");
+
+                        btn.innerHTML = `
+                    <span class="flex-1 pr-2 break-keep flex items-center gap-2.5">
+                        ${
+                            isSelected
+                                ? '<i class="fa-solid fa-circle-check text-cyan-400"></i>'
+                                : ""
+                        }
+                        ${optText}
+                    </span>
+                    <i class="fa-solid fa-chevron-right text-gray-500 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all text-xs"></i>
+                `;
+                        quizOptionsContainer.appendChild(btn);
+                    });
+                } else {
+                    document
+                        .getElementById("quiz-active")
+                        .classList.add("hidden");
+                    document
+                        .getElementById("quiz-result")
+                        .classList.remove("hidden");
+                    document
+                        .getElementById("quiz-result")
+                        .classList.add("flex");
+
+                    renderQuizResultSummary();
+                }
+            }
+
+            function answerQuiz(optionIdx) {
+                if (quizStep === 0) {
+                    selectedQ1OptionIndex = optionIdx;
+                }
+                var curOpt = quizData[quizStep].options[optionIdx];
+                userAnswers[quizStep] = curOpt;
+                quizStep++;
+                renderQuizStep(quizStep);
+            }
+
+            function prevQuiz() {
+                if (quizStep > 0) {
+                    quizStep--;
+                    renderQuizStep(quizStep);
+                }
+            }
+
+            function renderQuizResultSummary() {
+                var archetype =
+                    archetypeMap[selectedQ1OptionIndex] || archetypeMap[0];
+
+                var badgeWrapper = document.getElementById(
+                    "result-badge-wrapper"
+                );
+                var badgeText = document.getElementById("result-badge-text");
+                badgeWrapper.className =
+                    "inline-flex items-center gap-2 px-5 py-2 rounded-full border text-xs font-mono font-extrabold mb-5 shadow-lg tracking-wider uppercase animate-pulse " +
+                    archetype.badgeClass;
+                badgeText.innerText = archetype.badge;
+
+                var titleEl = document.getElementById("result-title");
+                var descEl = document.getElementById("result-desc");
+                titleEl.className =
+                    "text-2xl sm:text-4xl font-black mb-3 tracking-tight " +
+                    archetype.titleClass;
+                titleEl.innerText = archetype.title;
+                descEl.innerText = archetype.desc;
+
+                var flowchartEl = document.getElementById("roadmap-flowchart");
+                flowchartEl.innerHTML = "";
+
+                archetype.steps.forEach(function (stepName, idx) {
+                    var item = document.createElement("div");
+                    item.className = "flex flex-col items-center group";
+                    item.innerHTML = `
+                <div class="w-full bg-gray-900/90 border border-cyan-500/30 rounded-xl p-2 sm:p-2.5 flex flex-col items-center justify-center hover:border-cyan-400 transition-all shadow-md">
+                    <span class="text-[9px] font-mono text-cyan-400 font-extrabold mb-0.5">STEP 0${
+                        idx + 1
+                    }</span>
+                    <span class="text-[10px] sm:text-xs font-bold text-gray-100 whitespace-nowrap">${stepName}</span>
+                </div>
+            `;
+                    flowchartEl.appendChild(item);
+                });
+
+                var summaryList = document.getElementById("quiz-summary-list");
+                summaryList.innerHTML = "";
+                quizData.forEach(function (qObj, idx) {
+                    var ansText = userAnswers[idx] || "미응답";
+                    var item = document.createElement("div");
+                    item.className =
+                        "flex justify-between items-center py-1 border-b border-white/5";
+                    item.innerHTML = `
+                <span class="text-gray-400 font-mono text-[10px]">Q0${
+                    idx + 1
+                }</span>
+                <span class="text-cyan-200 text-right truncate max-w-[220px] sm:max-w-[300px]">${ansText}</span>
+            `;
+                    summaryList.appendChild(item);
+                });
+
+                document.getElementById("attached-archetype-name").innerText =
+                    "유형: " + archetype.title.replace(/"/g, "");
+            }
+
+            function scrollToForm() {
+                document
+                    .getElementById("coaching-form")
+                    .scrollIntoView({ behavior: "smooth" });
+            }
+
+            /* CLIENT SUBMISSION HANDLER */
+            function handleClientSubmit(event) {
+                event.preventDefault();
+
+                var name = document.getElementById("input-name").value.trim();
+                var age = document.getElementById("input-age").value.trim();
+                var location = document
+                    .getElementById("input-location")
+                    .value.trim();
+                var time = document.getElementById("input-time").value.trim();
+                var phone = document.getElementById("input-phone").value.trim();
+
+                var now = new Date();
+                var formattedDate =
+                    now.getFullYear() +
+                    "-" +
+                    String(now.getMonth() + 1).padStart(2, "0") +
+                    "-" +
+                    String(now.getDate()).padStart(2, "0") +
+                    " " +
+                    String(now.getHours()).padStart(2, "0") +
+                    ":" +
+                    String(now.getMinutes()).padStart(2, "0");
+
+                var finalAnswers = quizData.map(function (q, idx) {
+                    return userAnswers[idx] ? userAnswers[idx] : q.options[0];
+                });
+
+                var newApp = {
+                    id: "APP-" + Math.floor(9000 + Math.random() * 999),
+                    date: formattedDate,
+                    name: name,
+                    age: age,
+                    location: location,
+                    time: time,
+                    phone: phone,
+                    coach: "미배정",
+                    status: "티엠예정",
+                    q1Index: selectedQ1OptionIndex,
+                    answers: finalAnswers,
+                };
+
+                applications.unshift(newApp);
+                saveState();
+                updatePendingBadge();
+                event.target.reset();
+
+                var modal = document.getElementById("success-modal");
+                modal.classList.add("active");
+            }
+
+            function closeSuccessModal() {
+                var modal = document.getElementById("success-modal");
+                modal.classList.remove("active");
+                switchView("admin");
+            }
+
+            function updatePendingBadge() {
+                var pendingCount = applications.filter(function (a) {
+                    return a.status === "티엠예정";
+                }).length;
+                var badge = document.getElementById("pending-badge");
+                if (badge) badge.innerText = pendingCount;
+            }
+
+            /* DYNAMIC COACH MANAGER LOGIC */
+            function handleAddCoach(event) {
+                event.preventDefault();
+                var input = document.getElementById("input-coach-name");
+                var newName = input.value.trim();
+                if (!newName) return;
+
+                if (coaches.indexOf(newName) !== -1) {
+                    showToast("이미 등록된 코치 이름입니다.");
+                    input.value = "";
+                    return;
+                }
+
+                coaches.push(newName);
+                saveState();
+                input.value = "";
+                renderAdminDashboard();
+                showToast("✨ 새로운 코치가 등록되었습니다: " + newName);
+            }
+
+            function removeCoach(coachName) {
+                if (coachName === "미배정") return;
+
+                // Automatically revert assigned applicants to '미배정'
+                applications.forEach(function (app) {
+                    if (app.coach === coachName) {
+                        app.coach = "미배정";
+                    }
+                });
+
+                coaches = coaches.filter(function (c) {
+                    return c !== coachName;
+                });
+                saveState();
+                renderAdminDashboard();
+                showToast(
+                    "코치가 삭제되었습니다. 해당 코치의 담당건은 '미배정'으로 전환되었습니다."
+                );
+            }
+
+            function renderCoachList() {
+                var container = document.getElementById("coach-list-container");
+                var totalCountEl = document.getElementById("coach-total-count");
+                if (!container || !totalCountEl) return;
+
+                container.innerHTML = "";
+                totalCountEl.innerText = coaches.length + "명";
+
+                coaches.forEach(function (coachName) {
+                    var assignedCount = applications.filter(function (a) {
+                        return a.coach === coachName;
+                    }).length;
+
+                    var div = document.createElement("div");
+                    div.className =
+                        "glass-card p-3 rounded-xl border border-white/5 flex items-center justify-between text-xs hover:border-purple-500/30 transition-all";
+
+                    var isDefault = coachName === "미배정";
+
+                    div.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full ${
+                        isDefault ? "bg-gray-500" : "bg-purple-400"
+                    }"></span>
+                    <span class="font-bold ${
+                        isDefault ? "text-gray-400" : "text-gray-200"
+                    }">${coachName}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-mono px-2 py-0.5 rounded-full ${
+                        assignedCount > 0
+                            ? "bg-cyan-950 text-cyan-400 border border-cyan-500/30"
+                            : "bg-gray-900 text-gray-500"
+                    } font-bold">
+                        ${assignedCount}건
+                    </span>
+                    ${
+                        !isDefault
+                            ? `
+                        <button onclick="removeCoach('${coachName}')" title="코치 삭제" class="text-gray-500 hover:text-rose-400 px-1 py-0.5 rounded transition-colors">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    `
+                            : ""
+                    }
+                </div>
+            `;
+                    container.appendChild(div);
+                });
+            }
+
+            /* ADMIN DASHBOARD RENDERER */
+            function renderAdminDashboard() {
+                updatePendingBadge();
+                renderCoachList();
+
+                var total = applications.length;
+                var pending = applications.filter(function (a) {
+                    return a.status === "티엠예정";
+                }).length;
+                var completed = applications.filter(function (a) {
+                    return a.status === "티엠완료";
+                }).length;
+
+                document.getElementById("stat-total").innerText = total + "건";
+                document.getElementById("stat-pending").innerText =
+                    pending + "건";
+                document.getElementById("stat-completed").innerText =
+                    completed + "건";
+
+                var filtered = applications;
+                if (currentFilter !== "all") {
+                    filtered = filtered.filter(function (a) {
+                        return a.status === currentFilter;
+                    });
+                }
+
+                if (searchQuery) {
+                    var q = searchQuery.toLowerCase();
+                    filtered = filtered.filter(function (a) {
+                        return (
+                            a.name.toLowerCase().indexOf(q) !== -1 ||
+                            a.phone.indexOf(q) !== -1
+                        );
+                    });
+                }
+
+                var tbody = document.getElementById("app-list-tbody");
+                var emptyState = document.getElementById("empty-state");
+                document.getElementById("table-count-label").innerText =
+                    "총 " + filtered.length + "건";
+                tbody.innerHTML = "";
+
+                if (filtered.length === 0) {
+                    emptyState.classList.remove("hidden");
+                    return;
+                } else {
+                    emptyState.classList.add("hidden");
+                }
+
+                filtered.forEach(function (app) {
+                    var tr = document.createElement("tr");
+                    tr.className =
+                        "hover:bg-white/5 transition-colors border-b border-white/5";
+
+                    var statusBadgeClass =
+                        "bg-amber-950/80 text-amber-300 border border-amber-500/30";
+                    if (app.status === "티엠완료")
+                        statusBadgeClass =
+                            "bg-emerald-950/80 text-emerald-300 border border-emerald-500/30";
+
+                    var coachOptions = coaches
+                        .map(function (c) {
+                            return `<option value="${c}" ${app.coach === c ? "selected" : ""} class="bg-gray-900 text-white">${c}</option>`;
+                        })
+                        .join("");
+
+                    var arch = archetypeMap[app.q1Index] || archetypeMap[0];
+
+                    tr.innerHTML = `
+                <td class="p-4 whitespace-nowrap">
+                    <span class="font-mono text-[11px] text-cyan-400 font-bold block">${
+                        app.id
+                    }</span>
+                    <span class="text-gray-400 text-[10px] font-mono">${
+                        app.date
+                    }</span>
+                </td>
+                <td class="p-4">
+                    <div class="font-bold text-white text-xs sm:text-sm">${
+                        app.name
+                    } (${app.age}세)</div>
+                    <div class="text-gray-400 text-[11px]">${
+                        app.location
+                    } | <span class="font-mono text-gray-300">${
+                        app.phone
+                    }</span></div>
+                </td>
+                <td class="p-4 whitespace-nowrap">
+                    <span class="text-[11px] font-bold text-cyan-300 bg-cyan-950/80 px-2.5 py-1 rounded-lg border border-cyan-500/30 inline-block">
+                        ${arch.title.replace(/"/g, "")}
+                    </span>
+                </td>
+                <td class="p-4">
+                    <select onchange="changeCoach('${
+                        app.id
+                    }', this.value)" class="bg-gray-900 border border-white/10 rounded-lg px-2 py-1 text-xs text-gray-200 focus:outline-none focus:border-cyan-400 font-medium">
+                        ${coachOptions}
+                    </select>
+                </td>
+                <td class="p-4">
+                    <select onchange="changeStatus('${
+                        app.id
+                    }', this.value)" class="bg-gray-900 border rounded-lg px-2 py-1 text-xs font-bold focus:outline-none ${statusBadgeClass}">
+                        <option value="티엠예정" ${
+                            app.status === "티엠예정" ? "selected" : ""
+                        } class="bg-gray-900 text-amber-300">티엠예정</option>
+                        <option value="티엠완료" ${
+                            app.status === "티엠완료" ? "selected" : ""
+                        } class="bg-gray-900 text-emerald-300">티엠완료</option>
+                    </select>
+                </td>
+                <td class="p-4 text-center whitespace-nowrap">
+                    <button onclick="openDetailModal('${
+                        app.id
+                    }')" class="px-2.5 py-1 bg-gray-800 hover:bg-gray-700 text-cyan-300 rounded-lg text-xs font-semibold mr-1 transition-colors border border-white/10">
+                        👁️ 상세
+                    </button>
+                    <button onclick="deleteApp('${
+                        app.id
+                    }')" class="px-2 py-1 text-gray-500 hover:text-rose-400 rounded-lg text-xs transition-colors">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </td>
+            `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            function changeCoach(id, coachName) {
+                var item = applications.find(function (a) {
+                    return a.id === id;
+                });
+                if (item) {
+                    item.coach = coachName;
+                    saveState();
+                    renderAdminDashboard();
+                    showToast(
+                        "담당 코치가 [" + coachName + "](으)로 변경되었습니다."
+                    );
+                }
+            }
+
+            function changeStatus(id, newStatus) {
+                var item = applications.find(function (a) {
+                    return a.id === id;
+                });
+                if (item) {
+                    item.status = newStatus;
+                    saveState();
+                    renderAdminDashboard();
+                    showToast(
+                        "TM 상태가 [" +
+                            newStatus +
+                            "](으)로 업데이트되었습니다."
+                    );
+                }
+            }
+
+            function deleteApp(id) {
+                applications = applications.filter(function (a) {
+                    return a.id !== id;
+                });
+                saveState();
+                renderAdminDashboard();
+                showToast("신청 내역이 삭제되었습니다.");
+            }
+
+            function filterStatus(status) {
+                currentFilter = status;
+                document
+                    .querySelectorAll(".filter-tab-btn")
+                    .forEach(function (btn) {
+                        btn.className =
+                            "filter-tab-btn px-4 py-2 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 whitespace-nowrap";
+                    });
+
+                var activeMap = {
+                    all: "filter-all",
+                    티엠예정: "filter-pending",
+                    티엠완료: "filter-completed",
+                };
+
+                var targetBtn = document.getElementById(activeMap[status]);
+                if (targetBtn) {
+                    targetBtn.className =
+                        "filter-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-cyan-400 text-gray-950 whitespace-nowrap shadow-md shadow-cyan-400/20";
+                }
+
+                renderAdminDashboard();
+            }
+
+            function handleSearch() {
+                searchQuery = document
+                    .getElementById("admin-search-input")
+                    .value.trim();
+                renderAdminDashboard();
+            }
+
+            /* EXCEL EXPORT FUNCTION */
+            function exportToExcel() {
+                if (typeof XLSX === "undefined") {
+                    showToast("⚠️ 엑셀 라이브러리를 로드할 수 없습니다.");
+                    return;
+                }
+                if (applications.length === 0) {
+                    showToast("내보낼 신청 데이터가 없습니다.");
+                    return;
+                }
+
+                var exportData = applications.map(function (app, index) {
+                    var arch = archetypeMap[app.q1Index] || archetypeMap[0];
+
+                    var row = {
+                        연번: index + 1,
+                        "신청 ID": app.id,
+                        접수일시: app.date,
+                        성명: app.name,
+                        나이: app.age + "세",
+                        거주지역: app.location,
+                        "상담 희망시간": app.time,
+                        연락처: app.phone,
+                        "담당 코치": app.coach,
+                        "TM 진행상태": app.status,
+                        "진단 유형": arch.title.replace(/"/g, ""),
+                        "맞춤 로드맵": arch.steps.join(" → "),
+                    };
+
+                    quizData.forEach(function (qObj, qIdx) {
+                        var ansText =
+                            app.answers && app.answers[qIdx]
+                                ? app.answers[qIdx]
+                                : "미응답";
+                        row["Q" + (qIdx + 1) + " 질문"] = qObj.q;
+                        row["Q" + (qIdx + 1) + " 답변"] = ansText;
+                    });
+
+                    return row;
+                });
+
+                var worksheet = XLSX.utils.json_to_sheet(exportData);
+                worksheet["!cols"] = [
+                    { wch: 6 },
+                    { wch: 12 },
+                    { wch: 18 },
+                    { wch: 10 },
+                    { wch: 8 },
+                    { wch: 22 },
+                    { wch: 24 },
+                    { wch: 16 },
+                    { wch: 14 },
+                    { wch: 14 },
+                    { wch: 26 },
+                    { wch: 45 },
+                    { wch: 28 },
+                    { wch: 35 },
+                    { wch: 28 },
+                    { wch: 35 },
+                    { wch: 28 },
+                    { wch: 35 },
+                ];
+
+                var workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(
+                    workbook,
+                    worksheet,
+                    "신청내역 및 진단결과"
+                );
+
+                var now = new Date();
+                var dateStr =
+                    now.getFullYear() +
+                    String(now.getMonth() + 1).padStart(2, "0") +
+                    String(now.getDate()).padStart(2, "0");
+                XLSX.writeFile(
+                    workbook,
+                    "마인드봇_신청내역_" + dateStr + ".xlsx"
+                );
+                showToast("📊 엑셀 파일이 내보내졌습니다.");
+            }
+
+            /* JSON BACKUP DOWNLOAD */
+            function backupDataJSON() {
+                var backupPayload = {
+                    version: "2026.1",
+                    timestamp: new Date().toISOString(),
+                    coaches: coaches,
+                    applications: applications,
+                };
+
+                var dataStr =
+                    "data:text/json;charset=utf-8," +
+                    encodeURIComponent(JSON.stringify(backupPayload, null, 2));
+                var downloadAnchor = document.createElement("a");
+                downloadAnchor.setAttribute("href", dataStr);
+                downloadAnchor.setAttribute(
+                    "download",
+                    "mindbot_backup_" + Date.now() + ".json"
+                );
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+                showToast("📥 백업 JSON 파일이 다운로드되었습니다.");
+            }
+
+            /* DEMO RESET MODAL FUNCTIONS */
+            function openResetModal() {
+                var modal = document.getElementById("reset-modal");
+                modal.classList.add("active");
+            }
+
+            function closeResetModal() {
+                var modal = document.getElementById("reset-modal");
+                modal.classList.remove("active");
+            }
+
+            function confirmResetData() {
+                coaches = defaultCoaches.slice();
+                applications = defaultApplications.slice();
+                saveState();
+                closeResetModal();
+                renderAdminDashboard();
+                showToast("🔄 데모 데이터로 초기화되었습니다.");
+            }
+
+            /* APPLICANT DETAIL MODAL LOGIC */
+            function openDetailModal(id) {
+                var item = applications.find(function (a) {
+                    return a.id === id;
+                });
+                if (!item) return;
+
+                selectedItemId = id;
+                document.getElementById("modal-date").innerText = item.date;
+                document.getElementById("modal-name-title").innerText =
+                    item.name + " 님 (" + item.age + "세)";
+                document.getElementById("modal-location").innerText =
+                    item.location;
+                document.getElementById("modal-phone").innerText = item.phone;
+                document.getElementById("modal-time").innerText = item.time;
+                document.getElementById("modal-coach").innerText = item.coach;
+
+                var arch = archetypeMap[item.q1Index] || archetypeMap[0];
+                document.getElementById("modal-archetype-badge").innerText =
+                    arch.badge;
+                document.getElementById("modal-archetype-title").innerText =
+                    arch.title;
+
+                var modalRoadmapFlow =
+                    document.getElementById("modal-roadmap-flow");
+                modalRoadmapFlow.innerHTML = "";
+                arch.steps.forEach(function (step, idx) {
+                    var stepBox = document.createElement("div");
+                    stepBox.className =
+                        "bg-gray-900 border border-cyan-500/30 rounded-lg p-1.5 text-center";
+                    stepBox.innerHTML = `
+                <div class="text-[8px] font-mono text-cyan-400">STEP 0${
+                    idx + 1
+                }</div>
+                <div class="font-bold text-gray-200 text-[10px] whitespace-nowrap">${step}</div>
+            `;
+                    modalRoadmapFlow.appendChild(stepBox);
+                });
+
+                var answersContainer = document.getElementById(
+                    "modal-survey-answers"
+                );
+                answersContainer.innerHTML = "";
+
+                quizData.forEach(function (qObj, idx) {
+                    var ansText =
+                        item.answers && item.answers[idx]
+                            ? item.answers[idx]
+                            : "미응답";
+                    var card = document.createElement("div");
+                    card.className =
+                        "p-3 bg-gray-900/80 rounded-xl border border-white/5 space-y-1";
+                    card.innerHTML = `
+                <div class="font-bold text-gray-300 text-[11px] flex items-center gap-1.5">
+                    <span class="text-cyan-400 font-mono">Q${idx + 1}.</span>
+                    <span>${qObj.q}</span>
+                </div>
+                <div class="text-cyan-300 pl-4 font-medium text-xs bg-cyan-950/40 p-2 rounded-lg border border-cyan-500/20">
+                    ${ansText}
+                </div>
+            `;
+                    answersContainer.appendChild(card);
+                });
+
+                var modal = document.getElementById("detail-modal");
+                modal.classList.add("active");
+            }
+
+            function closeDetailModal() {
+                var modal = document.getElementById("detail-modal");
+                modal.classList.remove("active");
+                selectedItemId = null;
+            }
+
+            function deleteCurrentItem() {
+                if (selectedItemId) {
+                    deleteApp(selectedItemId);
+                    closeDetailModal();
+                }
+            }
+
+            /* WINDOW INITIALIZATION */
+            window.onload = function () {
+                loadState();
+                renderQuizStep(0);
+                renderAdminDashboard();
+            };
+        </script>
+    </body>
+</html>
